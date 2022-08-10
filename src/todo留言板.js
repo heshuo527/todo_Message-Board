@@ -8,34 +8,45 @@ var addButton = e('.todo-button')
 addButton.addEventListener('click', function() {
     //先获取到input输入的值
     var todoInput = e('.todo-input')
-    var todo = todoInput.value
-    console.log(todo)
-    toggsClass(todo, false)
-    saveTodos()
-
-
+    var c = function () {
+        var todo = todoInput.value
+        if (todo == '请输入' || todo == '') {
+            todo.value = '输入无效'
+            toggsClass(todo, false)
+            saveTodos()
+        } else {
+            var todo = todoInput.value
+            toggsClass(todo, false)
+            saveTodos()
+        }
+    }
+    c()
 })
-
-var toggsClass = function(todo, done) {
+var toggsClass = function(todo, done, time) {
     //获取到他的父容器
     var todoContainer = e('.todo-container')
+    
     //把输入进来的todo保存进去
-    var t = todoTemplate(todo, done)
+    var t = todoTemplate(todo, done, time)
     //beforeend是把新添加的元素放在最后
     todoContainer.insertAdjacentHTML('beforeend', t)
 
 }
 
-var todoTemplate = function(todo, done) {
+var todoTemplate = function(todo, done, time) {
     var status = ''
+    var time = data()
     if (done) {
         status = 'done'
+    } else if(time == undefined) {
+        time = data()
     }
     var t = `
     <div class="todo-cell ${status}" >
         <button class="todo-done">完成</button>
         <button class="todo-delete">删除</button>
         <span class="todo-span" contenteditable="true">${todo}</span>
+        <span class="date-span">${time}<span>
     </div>
     `
     return t
@@ -51,14 +62,14 @@ var todoContainer = e('.todo-container')
 todoContainer.addEventListener('click', function(event) {
     let target = event.target
     if(target.classList.contains('todo-done')) {
-        //找到这个元素的父节点
+        //找到这个元素的父元素
         var todoDiv = target.parentElement
         //给他添加一个class事件
         console.log('3312233');
         todoClass(todoDiv, 'done')
         saveTodos()
     } else if(target.classList.contains('todo-delete')) {
-        //找到这个元素的父节点
+        //找到这个元素的父元素
         var todoDiv = target.parentElement
         //并且删除它
         todoDiv.remove()
@@ -66,6 +77,24 @@ todoContainer.addEventListener('click', function(event) {
 
     }
 })
+
+//一键删除功能
+var deleteButton = e('.deletes-button')
+deleteButton.addEventListener('click', function() {
+    var delet = document.querySelectorAll('.todo-delete')
+    var d = []
+    //遍历出他的全部元素
+    for (let i = 0; i < delet.length; i++) {
+        var d = delet[i]
+        //然后找到他的父元素
+        var c = d.parentElement
+        //全部删除掉
+        c.remove()
+        console.log('dsadsa', d, c)
+    }
+    saveTodos()
+})
+
 var todoClass = function(element, className) {
     //判断这个这个元素是否拥有这个class
     if (element.classList.contains(className)) {
@@ -178,3 +207,15 @@ var todoInt = function() {
     }
 }
 todoInt()
+
+//添加时间
+function data() {
+    var d = new Date()
+    var nm = d.getFullYear()
+    var yt = d.getMonth() + 1
+    var ri = d.getDate()
+    var ui = d.getHours()
+    var ff = d.getMinutes()
+    var mc = d.getSeconds()
+    return `${nm}年${yt}月${ri}日${ui}时${ff}分${mc}秒`
+}
